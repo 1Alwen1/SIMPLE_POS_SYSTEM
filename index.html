@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple POS System</title>
+    <style>
+        body {
+            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .nav button {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+        .nav button:hover, .nav button.active {
+            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+        }
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 40px;
+            font-size: 3em;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #00f2fe;
+            padding-bottom: 15px;
+            font-size: 2em;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        h3 {
+            color: #34495e;
+            font-size: 1.5em;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+        .section {
+            margin-bottom: 40px;
+            border: none;
+            padding: 40px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        .section:hover {
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .subsection {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #00f2fe;
+        }
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .input-group input {
+            flex: 1;
+            min-width: 200px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.95em;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #e9ecef;
+            padding: 15px;
+            text-align: left;
+        }
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        tr:hover {
+            background-color: #e3f2fd;
+            transform: scale(1.01);
+            transition: all 0.2s ease;
+        }
+        button {
+            padding: 12px 24px;
+            margin: 5px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        button:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button:before {
+            content: '➕ ';
+            font-size: 1.2em;
+        }
+        button.remove:before {
+            content: '🗑️ ';
+        }
+        button.clear:before {
+            content: '🧹 ';
+        }
+        input {
+            padding: 12px 15px;
+            margin: 5px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1em;
+            width: calc(100% - 24px);
+            max-width: 300px;
+            transition: all 0.3s ease;
+            background: #ffffff;
+        }
+        input:focus {
+            border-color: #00f2fe;
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+            transform: scale(1.02);
+        }
+        #cart {
+            list-style: none;
+            padding: 0;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        #cart li {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        #cart li:last-child {
+            border-bottom: none;
+        }
+        .tab-buttons {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .tab-buttons button {
+            background: #e9ecef;
+            color: #495057;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+        .tab-buttons button:hover, .tab-buttons button.active {
+            background: #00f2fe;
+            color: white;
+            border-color: #00f2fe;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        #changeResult {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #ffffff;
+            font-size: 0.9em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .section { padding: 20px; }
+            table { font-size: 0.8em; }
+            button { padding: 10px 15px; font-size: 0.9em; }
+            input { width: calc(100% - 20px); }
+            .nav { flex-direction: column; gap: 10px; }
+            .input-group { flex-direction: column; align-items: stretch; }
+            h1 { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💼 Simple POS System</h1>
+        <div class="nav">
+            <button id="nav-inventory" class="active">📦 Inventory</button>
+            <button id="nav-transactions">🛒 Transactions</button>
+            <button id="nav-history">📊 History</button>
+        </div>
+
+        <!-- Inventory Section -->
+        <div id="inventory" class="section active">
+            <h2>📦 Inventory Management</h2>
+            <div class="subsection">
+                <h3>➕ Add New Item</h3>
+                <div class="input-group">
+                    <input type="text" id="itemName" placeholder="Item Name" required>
+                    <select id="itemCategorySelect" style="padding: 12px 15px; border-radius: 10px; border: 2px solid #e9ecef;">
+                        <!-- Options will be added by JavaScript -->
+                    </select>
+                    <input type="text" id="itemCategoryCustom" placeholder="New category (if selected above)">
+                    <input type="number" id="itemPrice" placeholder="Price" min="0" step="0.01" required>
+                    <button onclick="addItem()">Add Item</button>
+                </div>
+            </div>
+            <div class="subsection">
+                <h3>📋 Item List</h3>
+                <div class="tab-buttons" id="tabButtons"></div>
+                <div id="tabContents"></div>
+            </div>
+        </div>
+
+        <!-- Transaction Section -->
+        <div id="transactions" class="section">
+            <h2>🛒 Transaction Processing</h2>
+            <p>Select items to add to your cart:</p>
+            <h3>📂 Categories</h3>
+            <div id="transactionCategories" class="tab-buttons"></div>
+            <div id="itemButtons"></div>
+            <h3>🛍️ Shopping Cart</h3>
+            <ul id="cart"></ul>
+            <p><strong>Total: $<span id="total">0.00</span></strong></p>
+            <div class="input-group">
+                <input type="number" id="payment" placeholder="Customer Payment" min="0" step="0.01">
+                <button onclick="calculateChange()">💰 Calculate Change</button>
+            </div>
+            <p id="changeResult"></p>
+            <button class="clear" onclick="clearCart()">Clear Cart</button>
+        </div>
+
+        <!-- Transaction History Section -->
+        <div id="history" class="section">
+            <h2>📊 Transaction History</h2>
+            <table id="historyTable">
+                <thead>
+                    <tr>
+                        <th>📅 Date/Time</th>
+                        <th>🛒 Items Bought</th>
+                        <th>💵 Total</th>
+                        <th>💳 Payment</th>
+                        <th>🔄 Change</th>
+                    </tr>
+                </thead>
+                <tbody id="historyList"></tbody>
+            </table>
+            <button class="clear" onclick="clearHistory()">Clear History</button>
+        </div>
+    </div>
+    <footer>&copy; 2023 Simple POS System. Built with ❤️ for efficiency.</footer>
+
+    <script>
+        /* ================== DATA ================== */
+        let items = [];
+        let cart = [];
+        let history = [];
+        
+        try {
+            items = JSON.parse(localStorage.getItem('items')) || [];
+            history = JSON.parse(localStorage.getItem('history')) || [];
+        } catch (e) {
+            console.warn("LocalStorage error", e);
+        }
+        
+        /* ================== NAVIGATION ================== */
+        document.getElementById('nav-inventory').onclick = () => showSection('inventory');
+        document.getElementById('nav-transactions').onclick = () => showSection('transactions');
+        document.getElementById('nav-history').onclick = () => showSection('history');
+        
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById(`nav-${id}`).classList.add('active');
+        }
+        
+        /* ================== INVENTORY ================== */
+        function addItem() {
+    const name = document.getElementById('itemName').value.trim();
+    const price = parseFloat(document.getElementById('itemPrice').value);
+    const categorySelect = document.getElementById('itemCategorySelect');
+    const customCategory = document.getElementById('itemCategoryCustom').value.trim();
+
+    let category = "General";
+
+    if (categorySelect.value === "__new__" && customCategory) {
+        category = customCategory;
+    } else if (categorySelect.value) {
+        category = categorySelect.value;
+    }
+
+    if (!name || isNaN(price) || price < 0) {
+        alert("Invalid item data");
+        return;
+    }
+
+    items.push({ name, category, price });
+    localStorage.setItem("items", JSON.stringify(items));
+
+    document.getElementById('itemName').value = "";
+    document.getElementById('itemPrice').value = "";
+    document.getElementById('itemCategoryCustom').value = "";
+    categorySelect.value = "";
+
+    updateItemTabs();
+    updateItemButtons();
+    updateTransactionCategories();
+    updateCategoryDropdown();
+}
+const selected = itemCategorySelect.value;
+const custom = itemCategoryCustom.value.trim();
+
+let category = "General";
+
+if (selected === "__new__" && custom) {
+    category = custom;
+} else if (selected) {
+    category = selected;
+}
+
+
+        function updateItemTabs() {
+            tabButtons.innerHTML = "";
+            tabContents.innerHTML = "";
+        
+            const categories = [...new Set(items.map(i => i.category))];
+            categories.forEach((cat, i) => {
+                const btn = document.createElement("button");
+                btn.textContent = cat;
+                btn.onclick = (e) => showTab(cat, e);
+                if (i === 0) btn.classList.add("active");
+                tabButtons.appendChild(btn);
+        
+                const div = document.createElement("div");
+                div.id = `tab-${cat}`;
+                div.className = "tab-content" + (i === 0 ? " active" : "");
+        
+                const table = document.createElement("table");
+                table.innerHTML = `
+                    <thead><tr><th>Item</th><th>Price</th><th>Action</th></tr></thead>
+                    <tbody></tbody>
+                `;
+        
+                const tbody = table.querySelector("tbody");
+                items.forEach((item, index) => {
+                    if (item.category === cat) {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>$${item.price.toFixed(2)}</td>
+                                <td><button class="remove" onclick="removeItem(${index})">Remove</button></td>
+                            </tr>
+                        `;
+                    }
+                });
+        
+                div.appendChild(table);
+                tabContents.appendChild(div);
+            });
+        }
+        
+        function showTab(category, e) {
+            document.querySelectorAll(".tab-buttons button").forEach(b => b.classList.remove("active"));
+            e.target.classList.add("active");
+        
+            document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+            document.getElementById(`tab-${category}`).classList.add("active");
+        }
+        
+        function removeItem(index) {
+            items.splice(index, 1);
+            localStorage.setItem("items", JSON.stringify(items));
+            updateItemTabs();
+            updateItemButtons();
+            updateTransactionCategories();
+        }
+        
+        /* ================== TRANSACTIONS ================== */
+        function updateItemButtons(category = "All") {
+            const buttonsDiv = document.getElementById("itemButtons");
+            buttonsDiv.innerHTML = "";
+
+            items.forEach((item, index) => {
+                if (category === "All" || item.category === category) {
+                    const btn = document.createElement("button");
+                    btn.textContent = `${item.name} - $${item.price.toFixed(2)}`;
+                    btn.onclick = () => addToCart(index);
+                    buttonsDiv.appendChild(btn);
+                }
+            });
+        }
+        
+        function updateTransactionCategories() {
+            const catDiv = document.getElementById("transactionCategories");
+            catDiv.innerHTML = "";
+
+            const categories = ["All", ...new Set(items.map(i => i.category))];
+
+            categories.forEach((cat, index) => {
+                const btn = document.createElement("button");
+                btn.textContent = cat;
+
+                if (index === 0) btn.classList.add("active");
+
+                btn.onclick = () => {
+                    document
+                        .querySelectorAll("#transactionCategories button")
+                        .forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    updateItemButtons(cat);
+                };
+
+                catDiv.appendChild(btn);
+            });
+        }
+        
+        function addToCart(index) {
+            cart.push(items[index]);
+            updateCart();
+        }
+        
+        
+/* ================== CART ================== */
+function updateCart() {
+    const cartList = document.getElementById("cart");
+    cartList.innerHTML = "";
+    let total = 0;
+
+    cart.forEach(item => {
+        total += item.price;
+        cartList.innerHTML += `
+            <li>
+                <span>${item.name}</span>
+                <span>$${item.price.toFixed(2)}</span>
+            </li>
+        `;
+    });
+
+    document.getElementById("total").textContent = total.toFixed(2);
+}
+
+/* ================== PAYMENT ================== */
+function calculateChange() {
+    const total = parseFloat(document.getElementById("total").textContent);
+    const payment = parseFloat(document.getElementById("payment").value);
+    const result = document.getElementById("changeResult");
+
+    if (isNaN(payment) || payment < total) {
+        result.textContent = "❌ Insufficient payment";
+        result.className = "error";
+        return;
+    }
+
+    const change = payment - total;
+    result.textContent = `✅ Change: $${change.toFixed(2)}`;
+    result.className = "success";
+
+    saveHistory(total, payment, change);
+   
+
+}
+
+/* ================== CART CONTROL ================== */
+function clearCart() {
+    cart = [];
+
+    document.getElementById("payment").value = "";
+    document.getElementById("changeResult").textContent = "";
+    document.getElementById("changeResult").className = "";
+
+    updateCart();
+}
+
+
+/* ================== HISTORY ================== */
+function saveHistory(total, payment, change) {
+    history.push({
+        date: new Date().toLocaleString(),
+        items: cart.map(i => i.name).join(", "),
+        total,
+        payment,
+        change
+    });
+
+    localStorage.setItem("history", JSON.stringify(history));
+    updateHistory();
+}
+
+function updateHistory() {
+    const list = document.getElementById("historyList");
+    list.innerHTML = "";
+
+    history.forEach(h => {
+        list.innerHTML += `
+            <tr>
+                <td>${h.date}</td>
+                <td>${h.items}</td>
+                <td>$${h.total.toFixed(2)}</td>
+                <td>$${h.payment.toFixed(2)}</td>
+                <td>$${h.change.toFixed(2)}</td>
+            </tr>
+        `;
+    });
+}
+function updateCategoryDropdown() {
+    const select = document.getElementById('itemCategorySelect');
+    if (!select) return;
+    
+    select.innerHTML = "";
+
+    const predefinedCategories = [
+        "POWDER", "SABON", "FABRIC CONDITIONER", "SHAMPOO", "TINAPA",
+        "ILIMNON", "SOFTDRINKS", "CANDY", "MAKAON", "TOOTH PASTE",
+        "KAPE", "GATAS", "NOODLES", "BAR", "SABON KATOL", "HAPLAS",
+        "KETCHUP POUCH", "BOTTLE", "CONDENSE"
+    ];
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = "";
+    defaultOption.textContent = "-- Select Category --";
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    select.appendChild(defaultOption);
+
+    predefinedCategories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        select.appendChild(option);
+    });
+
+    const newOption = document.createElement('option');
+    newOption.value = "__new__";
+    newOption.textContent = "+ Add New Category";
+    select.appendChild(newOption);
+}
+
+
+
+/* ================== INIT ================== */
+updateItemTabs();
+updateTransactionCategories();
+updateItemButtons();
+updateHistory();
+updateCategoryDropdown(); // <-- call this to populate dropdown immediately
+// Add this event listener near your other initialization code
+document.getElementById('nav-inventory').addEventListener('click', function() {
+    showSection('inventory');
+    setTimeout(updateCategoryDropdown, 100); // Small delay to ensure DOM is ready
+});
+
+
+</script>
