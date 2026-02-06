@@ -1,3 +1,7 @@
+## Download
+
+Click here to download the file for the Simple POS System: [Download](https://github.com/1Alwen1/SIMPLE_POS_SYSTEM/archive/refs/heads/pos_system_only.zip)
+
 # Simple POS System
 
 A web-based Point of Sale (POS) system built with HTML, CSS, JavaScript for the frontend and PHP/MySQL for the backend. This system allows users to manage inventory, process transactions, and view transaction history.
